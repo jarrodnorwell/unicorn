@@ -56,13 +56,13 @@
 
 /* Default target word size to pointer size.  */
 #ifndef TCG_TARGET_REG_BITS
-# if UINTPTR_MAX == UINT32_MAX
-#  define TCG_TARGET_REG_BITS 32
-# elif UINTPTR_MAX == UINT64_MAX
-#  define TCG_TARGET_REG_BITS 64
-# else
-#  error Unknown pointer size for tcg target
-# endif
+#if UINTPTR_MAX == UINT32_MAX
+#define TCG_TARGET_REG_BITS 32
+#elif UINTPTR_MAX == UINT64_MAX
+#define TCG_TARGET_REG_BITS 64
+#else
+#error Unknown pointer size for tcg target
+#endif
 #endif
 
 #if TCG_TARGET_REG_BITS == 32
@@ -98,45 +98,45 @@ typedef uint64_t TCGRegSet;
 
 #if TCG_TARGET_REG_BITS == 32
 /* Turn some undef macros into false macros.  */
-#define TCG_TARGET_HAS_extrl_i64_i32    0
-#define TCG_TARGET_HAS_extrh_i64_i32    0
-#define TCG_TARGET_HAS_div_i64          0
-#define TCG_TARGET_HAS_rem_i64          0
-#define TCG_TARGET_HAS_div2_i64         0
-#define TCG_TARGET_HAS_rot_i64          0
-#define TCG_TARGET_HAS_ext8s_i64        0
-#define TCG_TARGET_HAS_ext16s_i64       0
-#define TCG_TARGET_HAS_ext32s_i64       0
-#define TCG_TARGET_HAS_ext8u_i64        0
-#define TCG_TARGET_HAS_ext16u_i64       0
-#define TCG_TARGET_HAS_ext32u_i64       0
-#define TCG_TARGET_HAS_bswap16_i64      0
-#define TCG_TARGET_HAS_bswap32_i64      0
-#define TCG_TARGET_HAS_bswap64_i64      0
-#define TCG_TARGET_HAS_neg_i64          0
-#define TCG_TARGET_HAS_not_i64          0
-#define TCG_TARGET_HAS_andc_i64         0
-#define TCG_TARGET_HAS_orc_i64          0
-#define TCG_TARGET_HAS_eqv_i64          0
-#define TCG_TARGET_HAS_nand_i64         0
-#define TCG_TARGET_HAS_nor_i64          0
-#define TCG_TARGET_HAS_clz_i64          0
-#define TCG_TARGET_HAS_ctz_i64          0
-#define TCG_TARGET_HAS_ctpop_i64        0
-#define TCG_TARGET_HAS_deposit_i64      0
-#define TCG_TARGET_HAS_extract_i64      0
-#define TCG_TARGET_HAS_sextract_i64     0
-#define TCG_TARGET_HAS_extract2_i64     0
-#define TCG_TARGET_HAS_movcond_i64      0
-#define TCG_TARGET_HAS_add2_i64         0
-#define TCG_TARGET_HAS_sub2_i64         0
-#define TCG_TARGET_HAS_mulu2_i64        0
-#define TCG_TARGET_HAS_muls2_i64        0
-#define TCG_TARGET_HAS_muluh_i64        0
-#define TCG_TARGET_HAS_mulsh_i64        0
+#define TCG_TARGET_HAS_extrl_i64_i32 0
+#define TCG_TARGET_HAS_extrh_i64_i32 0
+#define TCG_TARGET_HAS_div_i64 0
+#define TCG_TARGET_HAS_rem_i64 0
+#define TCG_TARGET_HAS_div2_i64 0
+#define TCG_TARGET_HAS_rot_i64 0
+#define TCG_TARGET_HAS_ext8s_i64 0
+#define TCG_TARGET_HAS_ext16s_i64 0
+#define TCG_TARGET_HAS_ext32s_i64 0
+#define TCG_TARGET_HAS_ext8u_i64 0
+#define TCG_TARGET_HAS_ext16u_i64 0
+#define TCG_TARGET_HAS_ext32u_i64 0
+#define TCG_TARGET_HAS_bswap16_i64 0
+#define TCG_TARGET_HAS_bswap32_i64 0
+#define TCG_TARGET_HAS_bswap64_i64 0
+#define TCG_TARGET_HAS_neg_i64 0
+#define TCG_TARGET_HAS_not_i64 0
+#define TCG_TARGET_HAS_andc_i64 0
+#define TCG_TARGET_HAS_orc_i64 0
+#define TCG_TARGET_HAS_eqv_i64 0
+#define TCG_TARGET_HAS_nand_i64 0
+#define TCG_TARGET_HAS_nor_i64 0
+#define TCG_TARGET_HAS_clz_i64 0
+#define TCG_TARGET_HAS_ctz_i64 0
+#define TCG_TARGET_HAS_ctpop_i64 0
+#define TCG_TARGET_HAS_deposit_i64 0
+#define TCG_TARGET_HAS_extract_i64 0
+#define TCG_TARGET_HAS_sextract_i64 0
+#define TCG_TARGET_HAS_extract2_i64 0
+#define TCG_TARGET_HAS_movcond_i64 0
+#define TCG_TARGET_HAS_add2_i64 0
+#define TCG_TARGET_HAS_sub2_i64 0
+#define TCG_TARGET_HAS_mulu2_i64 0
+#define TCG_TARGET_HAS_muls2_i64 0
+#define TCG_TARGET_HAS_muluh_i64 0
+#define TCG_TARGET_HAS_mulsh_i64 0
 /* Turn some undef macros into true macros.  */
-#define TCG_TARGET_HAS_add2_i32         1
-#define TCG_TARGET_HAS_sub2_i32         1
+#define TCG_TARGET_HAS_add2_i32 1
+#define TCG_TARGET_HAS_sub2_i32 1
 #endif
 
 #ifndef TCG_TARGET_deposit_i32_valid
@@ -154,74 +154,72 @@ typedef uint64_t TCGRegSet;
 
 /* Only one of DIV or DIV2 should be defined.  */
 #if defined(TCG_TARGET_HAS_div_i32)
-#define TCG_TARGET_HAS_div2_i32         0
+#define TCG_TARGET_HAS_div2_i32 0
 #elif defined(TCG_TARGET_HAS_div2_i32)
-#define TCG_TARGET_HAS_div_i32          0
-#define TCG_TARGET_HAS_rem_i32          0
+#define TCG_TARGET_HAS_div_i32 0
+#define TCG_TARGET_HAS_rem_i32 0
 #endif
 #if defined(TCG_TARGET_HAS_div_i64)
-#define TCG_TARGET_HAS_div2_i64         0
+#define TCG_TARGET_HAS_div2_i64 0
 #elif defined(TCG_TARGET_HAS_div2_i64)
-#define TCG_TARGET_HAS_div_i64          0
-#define TCG_TARGET_HAS_rem_i64          0
+#define TCG_TARGET_HAS_div_i64 0
+#define TCG_TARGET_HAS_rem_i64 0
 #endif
 
 /* For 32-bit targets, some sort of unsigned widening multiply is required.  */
-#if TCG_TARGET_REG_BITS == 32 \
-    && !(defined(TCG_TARGET_HAS_mulu2_i32) \
-         || defined(TCG_TARGET_HAS_muluh_i32))
-# error "Missing unsigned widening multiply"
+#if TCG_TARGET_REG_BITS == 32 &&                                               \
+    !(defined(TCG_TARGET_HAS_mulu2_i32) || defined(TCG_TARGET_HAS_muluh_i32))
+#error "Missing unsigned widening multiply"
 #endif
 
-#if !defined(TCG_TARGET_HAS_v64) \
-    && !defined(TCG_TARGET_HAS_v128) \
-    && !defined(TCG_TARGET_HAS_v256)
-#define TCG_TARGET_MAYBE_vec            0
-#define TCG_TARGET_HAS_abs_vec          0
-#define TCG_TARGET_HAS_neg_vec          0
-#define TCG_TARGET_HAS_not_vec          0
-#define TCG_TARGET_HAS_andc_vec         0
-#define TCG_TARGET_HAS_orc_vec          0
-#define TCG_TARGET_HAS_shi_vec          0
-#define TCG_TARGET_HAS_shs_vec          0
-#define TCG_TARGET_HAS_shv_vec          0
-#define TCG_TARGET_HAS_mul_vec          0
-#define TCG_TARGET_HAS_sat_vec          0
-#define TCG_TARGET_HAS_minmax_vec       0
-#define TCG_TARGET_HAS_bitsel_vec       0
-#define TCG_TARGET_HAS_cmpsel_vec       0
+#if !defined(TCG_TARGET_HAS_v64) && !defined(TCG_TARGET_HAS_v128) &&           \
+    !defined(TCG_TARGET_HAS_v256)
+#define TCG_TARGET_MAYBE_vec 0
+#define TCG_TARGET_HAS_abs_vec 0
+#define TCG_TARGET_HAS_neg_vec 0
+#define TCG_TARGET_HAS_not_vec 0
+#define TCG_TARGET_HAS_andc_vec 0
+#define TCG_TARGET_HAS_orc_vec 0
+#define TCG_TARGET_HAS_shi_vec 0
+#define TCG_TARGET_HAS_shs_vec 0
+#define TCG_TARGET_HAS_shv_vec 0
+#define TCG_TARGET_HAS_mul_vec 0
+#define TCG_TARGET_HAS_sat_vec 0
+#define TCG_TARGET_HAS_minmax_vec 0
+#define TCG_TARGET_HAS_bitsel_vec 0
+#define TCG_TARGET_HAS_cmpsel_vec 0
 #else
-#define TCG_TARGET_MAYBE_vec            1
+#define TCG_TARGET_MAYBE_vec 1
 #endif
 #ifndef TCG_TARGET_HAS_v64
-#define TCG_TARGET_HAS_v64              0
+#define TCG_TARGET_HAS_v64 0
 #endif
 #ifndef TCG_TARGET_HAS_v128
-#define TCG_TARGET_HAS_v128             0
+#define TCG_TARGET_HAS_v128 0
 #endif
 #ifndef TCG_TARGET_HAS_v256
-#define TCG_TARGET_HAS_v256             0
+#define TCG_TARGET_HAS_v256 0
 #endif
 
 #ifndef TARGET_INSN_START_EXTRA_WORDS
-# define TARGET_INSN_START_WORDS 1
+#define TARGET_INSN_START_WORDS 1
 #else
-# define TARGET_INSN_START_WORDS (1 + TARGET_INSN_START_EXTRA_WORDS)
+#define TARGET_INSN_START_WORDS (1 + TARGET_INSN_START_EXTRA_WORDS)
 #endif
 
 typedef enum TCGOpcode {
-#define DEF(name, oargs, iargs, cargs, flags) INDEX_op_ ## name,
+#define DEF(name, oargs, iargs, cargs, flags) INDEX_op_##name,
 #include "tcg/tcg-opc.h"
 #undef DEF
     NB_OPS,
 } TCGOpcode;
 
-#define tcg_regset_set_reg(d, r)   ((d) |= (TCGRegSet)1 << (r))
+#define tcg_regset_set_reg(d, r) ((d) |= (TCGRegSet)1 << (r))
 #define tcg_regset_reset_reg(d, r) ((d) &= ~((TCGRegSet)1 << (r)))
-#define tcg_regset_test_reg(d, r)  (((d) >> (r)) & 1)
+#define tcg_regset_test_reg(d, r) (((d) >> (r)) & 1)
 
 #ifndef TCG_TARGET_INSN_UNIT_SIZE
-# error "Missing TCG_TARGET_INSN_UNIT_SIZE"
+#error "Missing TCG_TARGET_INSN_UNIT_SIZE"
 #elif TCG_TARGET_INSN_UNIT_SIZE == 1
 typedef uint8_t tcg_insn_unit;
 #elif TCG_TARGET_INSN_UNIT_SIZE == 2
@@ -234,15 +232,21 @@ typedef uint64_t tcg_insn_unit;
 /* The port better have done this.  */
 #endif
 
-
 #if defined CONFIG_DEBUG_TCG || defined QEMU_STATIC_ANALYSIS
-# define tcg_debug_assert(X) do { assert(X); } while (0)
+#define tcg_debug_assert(X)                                                    \
+    do {                                                                       \
+        assert(X);                                                             \
+    } while (0)
 #else
 #ifndef _MSC_VER
-# define tcg_debug_assert(X) \
-    do { if (!(X)) { __builtin_unreachable(); } } while (0)
+#define tcg_debug_assert(X)                                                    \
+    do {                                                                       \
+        if (!(X)) {                                                            \
+            __builtin_unreachable();                                           \
+        }                                                                      \
+    } while (0)
 #else
-# define tcg_debug_assert(X)
+#define tcg_debug_assert(X)
 #endif
 #endif
 
@@ -300,21 +304,21 @@ typedef enum TCGType {
 
     TCG_TYPE_COUNT, /* number of different types */
 
-    /* An alias for the size of the host register.  */
+/* An alias for the size of the host register.  */
 #if TCG_TARGET_REG_BITS == 32
     TCG_TYPE_REG = TCG_TYPE_I32,
 #else
     TCG_TYPE_REG = TCG_TYPE_I64,
 #endif
 
-    /* An alias for the size of the native pointer.  */
+/* An alias for the size of the native pointer.  */
 #if UINTPTR_MAX == UINT32_MAX
     TCG_TYPE_PTR = TCG_TYPE_I32,
 #else
     TCG_TYPE_PTR = TCG_TYPE_I64,
 #endif
 
-    /* An alias for the size of the target "long", aka register.  */
+/* An alias for the size of the target "long", aka register.  */
 #if TARGET_LONG_BITS == 64
     TCG_TYPE_TL = TCG_TYPE_I64,
 #else
@@ -397,23 +401,23 @@ typedef TCGv_ptr TCGv_env;
 /* call flags */
 /* Helper does not read globals (either directly or through an exception). It
    implies TCG_CALL_NO_WRITE_GLOBALS. */
-#define TCG_CALL_NO_READ_GLOBALS    0x0001
+#define TCG_CALL_NO_READ_GLOBALS 0x0001
 /* Helper does not write globals */
-#define TCG_CALL_NO_WRITE_GLOBALS   0x0002
+#define TCG_CALL_NO_WRITE_GLOBALS 0x0002
 /* Helper can be safely suppressed if the return value is not used. */
-#define TCG_CALL_NO_SIDE_EFFECTS    0x0004
+#define TCG_CALL_NO_SIDE_EFFECTS 0x0004
 /* Helper is QEMU_NORETURN.  */
-#define TCG_CALL_NO_RETURN          0x0008
+#define TCG_CALL_NO_RETURN 0x0008
 
 /* convenience version of most used call flags */
-#define TCG_CALL_NO_RWG         TCG_CALL_NO_READ_GLOBALS
-#define TCG_CALL_NO_WG          TCG_CALL_NO_WRITE_GLOBALS
-#define TCG_CALL_NO_SE          TCG_CALL_NO_SIDE_EFFECTS
-#define TCG_CALL_NO_RWG_SE      (TCG_CALL_NO_RWG | TCG_CALL_NO_SE)
-#define TCG_CALL_NO_WG_SE       (TCG_CALL_NO_WG | TCG_CALL_NO_SE)
+#define TCG_CALL_NO_RWG TCG_CALL_NO_READ_GLOBALS
+#define TCG_CALL_NO_WG TCG_CALL_NO_WRITE_GLOBALS
+#define TCG_CALL_NO_SE TCG_CALL_NO_SIDE_EFFECTS
+#define TCG_CALL_NO_RWG_SE (TCG_CALL_NO_RWG | TCG_CALL_NO_SE)
+#define TCG_CALL_NO_WG_SE (TCG_CALL_NO_WG | TCG_CALL_NO_SE)
 
 /* Used to align parameters.  See the comment before tcgv_i32_temp.  */
-#define TCG_CALL_DUMMY_ARG      ((TCGArg)0)
+#define TCG_CALL_DUMMY_ARG ((TCGArg)0)
 
 /* Conditions.  Note that these are laid out for easy manipulation by
    the functions below:
@@ -423,20 +427,20 @@ typedef TCGv_ptr TCGv_env;
      bit 3 is used with bit 0 for swapping signed/unsigned.  */
 typedef enum {
     /* non-signed */
-    TCG_COND_NEVER  = 0 | 0 | 0 | 0,
+    TCG_COND_NEVER = 0 | 0 | 0 | 0,
     TCG_COND_ALWAYS = 0 | 0 | 0 | 1,
-    TCG_COND_EQ     = 8 | 0 | 0 | 0,
-    TCG_COND_NE     = 8 | 0 | 0 | 1,
+    TCG_COND_EQ = 8 | 0 | 0 | 0,
+    TCG_COND_NE = 8 | 0 | 0 | 1,
     /* signed */
-    TCG_COND_LT     = 0 | 0 | 2 | 0,
-    TCG_COND_GE     = 0 | 0 | 2 | 1,
-    TCG_COND_LE     = 8 | 0 | 2 | 0,
-    TCG_COND_GT     = 8 | 0 | 2 | 1,
+    TCG_COND_LT = 0 | 0 | 2 | 0,
+    TCG_COND_GE = 0 | 0 | 2 | 1,
+    TCG_COND_LE = 8 | 0 | 2 | 0,
+    TCG_COND_GT = 8 | 0 | 2 | 1,
     /* unsigned */
-    TCG_COND_LTU    = 0 | 4 | 0 | 0,
-    TCG_COND_GEU    = 0 | 4 | 0 | 1,
-    TCG_COND_LEU    = 8 | 4 | 0 | 0,
-    TCG_COND_GTU    = 8 | 4 | 0 | 1,
+    TCG_COND_LTU = 0 | 4 | 0 | 0,
+    TCG_COND_GEU = 0 | 4 | 0 | 1,
+    TCG_COND_LEU = 8 | 4 | 0 | 0,
+    TCG_COND_GTU = 8 | 4 | 0 | 1,
 } TCGCond;
 
 /* Invert the sense of the comparison.  */
@@ -492,23 +496,23 @@ typedef enum TCGTempVal {
 } TCGTempVal;
 
 typedef struct TCGTemp {
-    TCGReg reg:8;
-    TCGTempVal val_type:8;
-    TCGType base_type:8;
-    TCGType type:8;
-    unsigned int fixed_reg:1;
-    unsigned int indirect_reg:1;
-    unsigned int indirect_base:1;
-    unsigned int mem_coherent:1;
-    unsigned int mem_allocated:1;
+    TCGReg reg : 8;
+    TCGTempVal val_type : 8;
+    TCGType base_type : 8;
+    TCGType type : 8;
+    unsigned int fixed_reg : 1;
+    unsigned int indirect_reg : 1;
+    unsigned int indirect_base : 1;
+    unsigned int mem_coherent : 1;
+    unsigned int mem_allocated : 1;
     /* If true, the temp is saved across both basic blocks and
        translation blocks.  */
-    unsigned int temp_global:1;
+    unsigned int temp_global : 1;
     /* If true, the temp is saved across basic blocks but dead
        at the end of translation blocks.  If false, the temp is
        dead at the end of basic blocks.  */
-    unsigned int temp_local:1;
-    unsigned int temp_allocated:1;
+    unsigned int temp_local : 1;
+    unsigned int temp_allocated : 1;
 
     tcg_target_long val;
     struct TCGTemp *mem_base;
@@ -532,25 +536,25 @@ typedef struct TCGTempSet {
    this imples a max of 6*2 (64-bit in) + 2 (64-bit out) = 14 operands.
    There are never more than 2 outputs, which means that we can store all
    dead + sync data within 16 bits.  */
-#define DEAD_ARG  4
-#define SYNC_ARG  1
+#define DEAD_ARG 4
+#define SYNC_ARG 1
 typedef uint16_t TCGLifeData;
 
 /* The layout here is designed to avoid a bitfield crossing of
    a 32-bit boundary, which would cause GCC to add extra padding.  */
 typedef struct TCGOp {
 #ifdef _MSC_VER
-    uint32_t opc   : 8;        /*  8 */
+    uint32_t opc : 8; /*  8 */
 #else
-    TCGOpcode opc   : 8;        /*  8 */
+    TCGOpcode opc : 8; /*  8 */
 #endif
 
     /* Parameters for this opcode.  See below.  */
-    unsigned param1 : 4;        /* 12 */
-    unsigned param2 : 4;        /* 16 */
+    unsigned param1 : 4; /* 12 */
+    unsigned param2 : 4; /* 16 */
 
     /* Lifetime data of the operands.  */
-    unsigned life   : 16;       /* 32 */
+    unsigned life : 16; /* 32 */
 
     /* Next and previous opcodes.  */
     QTAILQ_ENTRY(TCGOp) link;
@@ -562,11 +566,11 @@ typedef struct TCGOp {
     TCGRegSet output_pref[2];
 } TCGOp;
 
-#define TCGOP_CALLI(X)    (X)->param1
-#define TCGOP_CALLO(X)    (X)->param2
+#define TCGOP_CALLI(X) (X)->param1
+#define TCGOP_CALLO(X) (X)->param2
 
-#define TCGOP_VECL(X)     (X)->param1
-#define TCGOP_VECE(X)     (X)->param2
+#define TCGOP_VECL(X) (X)->param1
+#define TCGOP_VECE(X) (X)->param2
 
 /* Make sure operands fit in the bitfields above.  */
 QEMU_BUILD_BUG_ON(NB_OPS > (1 << 8));
@@ -605,10 +609,10 @@ struct tcg_region_state {
     void *start_aligned;
     void *end;
     size_t n;
-    size_t size; /* size of one region */
+    size_t size;   /* size of one region */
     size_t stride; /* .size + guard size */
 
-    size_t current; /* current region index */
+    size_t current;       /* current region index */
     size_t agg_size_full; /* aggregate size of full regions */
 };
 
@@ -661,7 +665,7 @@ struct TCGContext {
     size_t tb_phys_invalidate_count;
 
     /* Track which vCPU triggers events */
-    CPUState *cpu;                      /* *_trans */
+    CPUState *cpu; /* *_trans */
 
     /* These structures are private to tcg-target.inc.c.  */
 #ifdef TCG_TARGET_NEED_LDST_LABELS
@@ -702,6 +706,7 @@ struct TCGContext {
     struct jit_code_entry *one_entry;
     /* qemu/tcg/tcg-common.c */
     TCGOpDef *tcg_op_defs;
+    size_t tcg_op_defs_max;
 
     // Unicorn engine variables
     struct uc_struct *uc;
@@ -721,7 +726,7 @@ struct TCGContext {
 
     /* target/riscv/translate.c */
     TCGv cpu_gpr[32], cpu_pc; // also target/mips/translate.c
-    TCGv_i64 cpu_fpr[32]; /* assume F and D extensions */
+    TCGv_i64 cpu_fpr[32];     /* assume F and D extensions */
     TCGv load_res;
     TCGv load_val;
 
@@ -799,7 +804,7 @@ struct TCGContext {
     TCGv_i32 cpu_gpr_d[16];
     TCGv_i32 cpu_PSW_C, cpu_PSW_V, cpu_PSW_SV, cpu_PSW_AV, cpu_PSW_SAV;
     TCGv_i32 cpu_PC, cpu_PCXI, cpu_PSW, cpu_ICR;
-    
+
     // Used to store the start of current instrution.
     uint64_t pc_start;
 
@@ -813,10 +818,11 @@ struct TCGContext {
     TCGv_i64 cc_dst;
     TCGv_i64 cc_vr;
 
-    char s390x_cpu_reg_names[16][4]; // renamed from original cpu_reg_names[][] to avoid name clash with m68k
+    char s390x_cpu_reg_names[16][4]; // renamed from original cpu_reg_names[][]
+                                     // to avoid name clash with m68k
     TCGv_i64 regs[16];
 
-    // loongarch 
+    // loongarch
     bool use_lsx_instructions;
 };
 
@@ -969,9 +975,10 @@ size_t tcg_tb_phys_invalidate_count(TCGContext *tcg_ctx);
 TranslationBlock *tcg_tb_lookup(TCGContext *tcg_ctx, uintptr_t tc_ptr);
 /* glib gtree:
  * gboolean (*GTraverseFunc)  (gpointer key, gpointer value, gpointer data);
-*/
-typedef int (*GTraverseFunc) (void *key, void *value, void *data);
-void tcg_tb_foreach(TCGContext *tcg_ctx, GTraverseFunc func, gpointer user_data);
+ */
+typedef int (*GTraverseFunc)(void *key, void *value, void *data);
+void tcg_tb_foreach(TCGContext *tcg_ctx, GTraverseFunc func,
+                    gpointer user_data);
 size_t tcg_nb_tbs(TCGContext *tcg_ctx);
 
 /* user-mode: Called with mmap_lock held.  */
@@ -1029,10 +1036,11 @@ static inline void tcg_temp_free_vec(TCGContext *tcg_ctx, TCGv_vec arg)
     tcg_temp_free_internal(tcg_ctx, tcgv_vec_temp(tcg_ctx, arg));
 }
 
-static inline TCGv_i32 tcg_global_mem_new_i32(TCGContext *tcg_ctx, TCGv_ptr reg, intptr_t offset,
-                                              const char *name)
+static inline TCGv_i32 tcg_global_mem_new_i32(TCGContext *tcg_ctx, TCGv_ptr reg,
+                                              intptr_t offset, const char *name)
 {
-    TCGTemp *t = tcg_global_mem_new_internal(tcg_ctx, TCG_TYPE_I32, reg, offset, name);
+    TCGTemp *t =
+        tcg_global_mem_new_internal(tcg_ctx, TCG_TYPE_I32, reg, offset, name);
     return temp_tcgv_i32(tcg_ctx, t);
 }
 
@@ -1048,10 +1056,11 @@ static inline TCGv_i32 tcg_temp_local_new_i32(TCGContext *tcg_ctx)
     return temp_tcgv_i32(tcg_ctx, t);
 }
 
-static inline TCGv_i64 tcg_global_mem_new_i64(TCGContext *tcg_ctx, TCGv_ptr reg, intptr_t offset,
-                                              const char *name)
+static inline TCGv_i64 tcg_global_mem_new_i64(TCGContext *tcg_ctx, TCGv_ptr reg,
+                                              intptr_t offset, const char *name)
 {
-    TCGTemp *t = tcg_global_mem_new_internal(tcg_ctx, TCG_TYPE_I64, reg, offset, name);
+    TCGTemp *t =
+        tcg_global_mem_new_internal(tcg_ctx, TCG_TYPE_I64, reg, offset, name);
     return temp_tcgv_i64(tcg_ctx, t);
 }
 
@@ -1067,10 +1076,11 @@ static inline TCGv_i64 tcg_temp_local_new_i64(TCGContext *tcg_ctx)
     return temp_tcgv_i64(tcg_ctx, t);
 }
 
-static inline TCGv_ptr tcg_global_mem_new_ptr(TCGContext *tcg_ctx, TCGv_ptr reg, intptr_t offset,
-                                              const char *name)
+static inline TCGv_ptr tcg_global_mem_new_ptr(TCGContext *tcg_ctx, TCGv_ptr reg,
+                                              intptr_t offset, const char *name)
 {
-    TCGTemp *t = tcg_global_mem_new_internal(tcg_ctx, TCG_TYPE_PTR, reg, offset, name);
+    TCGTemp *t =
+        tcg_global_mem_new_internal(tcg_ctx, TCG_TYPE_PTR, reg, offset, name);
     return temp_tcgv_ptr(tcg_ctx, t);
 }
 
@@ -1095,17 +1105,19 @@ static inline TCGv_ptr tcg_temp_local_new_ptr(TCGContext *tcg_ctx)
 void tcg_clear_temp_count(void);
 int tcg_check_temp_count(void);
 #else
-#define tcg_clear_temp_count() do { } while (0)
+#define tcg_clear_temp_count()                                                 \
+    do {                                                                       \
+    } while (0)
 #define tcg_check_temp_count() 0
 #endif
 
 int64_t tcg_cpu_exec_time(void);
 
-#define TCG_CT_ALIAS  0x80
+#define TCG_CT_ALIAS 0x80
 #define TCG_CT_IALIAS 0x40
 #define TCG_CT_NEWREG 0x20 /* output requires a new register */
-#define TCG_CT_REG    0x01
-#define TCG_CT_CONST  0x02 /* any constant of register size */
+#define TCG_CT_REG 0x01
+#define TCG_CT_CONST 0x02 /* any constant of register size */
 
 typedef struct TCGArgConstraint {
     uint16_t ct;
@@ -1120,21 +1132,21 @@ typedef struct TCGArgConstraint {
 /* Bits for TCGOpDef->flags, 8 bits available.  */
 enum {
     /* Instruction exits the translation block.  */
-    TCG_OPF_BB_EXIT      = 0x01,
+    TCG_OPF_BB_EXIT = 0x01,
     /* Instruction defines the end of a basic block.  */
-    TCG_OPF_BB_END       = 0x02,
+    TCG_OPF_BB_END = 0x02,
     /* Instruction clobbers call registers and potentially update globals.  */
     TCG_OPF_CALL_CLOBBER = 0x04,
     /* Instruction has side effects: it cannot be removed if its outputs
        are not used, and might trigger exceptions.  */
     TCG_OPF_SIDE_EFFECTS = 0x08,
     /* Instruction operands are 64-bits (otherwise 32-bits).  */
-    TCG_OPF_64BIT        = 0x10,
+    TCG_OPF_64BIT = 0x10,
     /* Instruction is optional and not implemented by the host, or insn
        is generic and should not be implemened by the host.  */
-    TCG_OPF_NOT_PRESENT  = 0x20,
+    TCG_OPF_NOT_PRESENT = 0x20,
     /* Instruction operands are vectors.  */
-    TCG_OPF_VECTOR       = 0x40,
+    TCG_OPF_VECTOR = 0x40,
 };
 
 typedef struct TCGOpDef {
@@ -1154,18 +1166,19 @@ typedef struct TCGTargetOpDef {
 } TCGTargetOpDef;
 
 #ifndef NDEBUG
-#define tcg_abort() \
-do {\
-    fprintf(stderr, "%s:%d: tcg fatal error\n", __FILE__, __LINE__);\
-    abort();\
-} while (0)
+#define tcg_abort()                                                            \
+    do {                                                                       \
+        fprintf(stderr, "%s:%d: tcg fatal error\n", __FILE__, __LINE__);       \
+        abort();                                                               \
+    } while (0)
 #else
 #define tcg_abort() abort()
 #endif
 
 bool tcg_op_supported(TCGOpcode op);
 
-void tcg_gen_callN(TCGContext *tcg_ctx, void *func, TCGTemp *ret, int nargs, TCGTemp **args);
+void tcg_gen_callN(TCGContext *tcg_ctx, void *func, TCGTemp *ret, int nargs,
+                   TCGTemp **args);
 
 TCGOp *tcg_emit_op(TCGContext *tcg_ctx, TCGOpcode opc);
 void tcg_op_remove(TCGContext *s, TCGOp *op);
@@ -1184,11 +1197,15 @@ TCGv_vec tcg_const_zeros_vec_matching(TCGContext *tcg_ctx, TCGv_vec);
 TCGv_vec tcg_const_ones_vec_matching(TCGContext *tcg_ctx, TCGv_vec);
 
 #if UINTPTR_MAX == UINT32_MAX
-# define tcg_const_ptr(tcg_ctx, x)        ((TCGv_ptr)tcg_const_i32(tcg_ctx, (intptr_t)(x)))
-# define tcg_const_local_ptr(tcg_ctx, x)  ((TCGv_ptr)tcg_const_local_i32(tcg_ctx, (intptr_t)(x)))
+#define tcg_const_ptr(tcg_ctx, x)                                              \
+    ((TCGv_ptr)tcg_const_i32(tcg_ctx, (intptr_t)(x)))
+#define tcg_const_local_ptr(tcg_ctx, x)                                        \
+    ((TCGv_ptr)tcg_const_local_i32(tcg_ctx, (intptr_t)(x)))
 #else
-# define tcg_const_ptr(tcg_ctx, x)        ((TCGv_ptr)tcg_const_i64(tcg_ctx, (intptr_t)(x)))
-# define tcg_const_local_ptr(tcg_ctx, x)  ((TCGv_ptr)tcg_const_local_i64(tcg_ctx, (intptr_t)(x)))
+#define tcg_const_ptr(tcg_ctx, x)                                              \
+    ((TCGv_ptr)tcg_const_i64(tcg_ctx, (intptr_t)(x)))
+#define tcg_const_local_ptr(tcg_ctx, x)                                        \
+    ((TCGv_ptr)tcg_const_local_i64(tcg_ctx, (intptr_t)(x)))
 #endif
 
 TCGLabel *gen_new_label(TCGContext *tcg_ctx);
@@ -1346,17 +1363,18 @@ static inline unsigned get_mmuidx(TCGMemOpIdx oi)
  * to this default (which just calls the prologue.code emitted by
  * tcg_target_qemu_prologue()).
  */
-#define TB_EXIT_MASK      3
-#define TB_EXIT_IDX0      0
-#define TB_EXIT_IDX1      1
-#define TB_EXIT_IDXMAX    1
+#define TB_EXIT_MASK 3
+#define TB_EXIT_IDX0 0
+#define TB_EXIT_IDX1 1
+#define TB_EXIT_IDXMAX 1
 #define TB_EXIT_REQUESTED 3
 
 #ifdef HAVE_TCG_QEMU_TB_EXEC
 uintptr_t tcg_qemu_tb_exec(CPUArchState *env, uint8_t *tb_ptr);
 #else
-# define tcg_qemu_tb_exec(env, tb_ptr) \
-    ((uintptr_t (*)(void *, void *))env->uc->tcg_ctx->code_gen_prologue)(env, tb_ptr)
+#define tcg_qemu_tb_exec(env, tb_ptr)                                          \
+    ((uintptr_t (*)(void *, void *))env->uc->tcg_ctx->code_gen_prologue)(      \
+        env, tb_ptr)
 #endif
 
 void tcg_register_jit(TCGContext *s, void *buf, size_t buf_size);
@@ -1367,30 +1385,31 @@ void tcg_register_jit(TCGContext *s, void *buf, size_t buf_size);
    return < 0 if we must call tcg_expand_vec_op.  */
 int tcg_can_emit_vec_op(TCGContext *tcg_ctx, TCGOpcode, TCGType, unsigned);
 #else
-static inline int tcg_can_emit_vec_op(TCGContext *tcg_ctx, TCGOpcode o, TCGType t, unsigned ve)
+static inline int tcg_can_emit_vec_op(TCGContext *tcg_ctx, TCGOpcode o,
+                                      TCGType t, unsigned ve)
 {
     return 0;
 }
 #endif
 
 /* Expand the tuple (opc, type, vece) on the given arguments.  */
-void tcg_expand_vec_op(TCGContext *tcg_ctx, TCGOpcode, TCGType, unsigned, TCGArg, ...);
+void tcg_expand_vec_op(TCGContext *tcg_ctx, TCGOpcode, TCGType, unsigned,
+                       TCGArg, ...);
 
 /* Replicate a constant C accoring to the log2 of the element size.  */
 uint64_t dup_const_func(unsigned vece, uint64_t c);
 
 #ifndef _MSC_VER
-#define dup_const(VECE, C)                                         \
-    (__builtin_constant_p(VECE)                                    \
-     ? (  (VECE) == MO_8  ? 0x0101010101010101ull * (uint8_t)(C)   \
-        : (VECE) == MO_16 ? 0x0001000100010001ull * (uint16_t)(C)  \
-        : (VECE) == MO_32 ? 0x0000000100000001ull * (uint32_t)(C)  \
-        : dup_const_func(VECE, C))                                      \
-     : dup_const_func(VECE, C))
+#define dup_const(VECE, C)                                                     \
+    (__builtin_constant_p(VECE)                                                \
+         ? ((VECE) == MO_8    ? 0x0101010101010101ull * (uint8_t)(C)           \
+            : (VECE) == MO_16 ? 0x0001000100010001ull * (uint16_t)(C)          \
+            : (VECE) == MO_32 ? 0x0000000100000001ull * (uint32_t)(C)          \
+                              : dup_const_func(VECE, C))                       \
+         : dup_const_func(VECE, C))
 #else
 #define dup_const(VECE, C) dup_const_func(VECE, C)
 #endif
-
 
 /*
  * Memory helpers that will be used by TCG generated code.
@@ -1402,14 +1421,14 @@ tcg_target_ulong helper_le_lduw_mmu(CPUArchState *env, target_ulong addr,
                                     TCGMemOpIdx oi, uintptr_t retaddr);
 tcg_target_ulong helper_le_ldul_mmu(CPUArchState *env, target_ulong addr,
                                     TCGMemOpIdx oi, uintptr_t retaddr);
-uint64_t helper_le_ldq_mmu(CPUArchState *env, target_ulong addr,
-                           TCGMemOpIdx oi, uintptr_t retaddr);
+uint64_t helper_le_ldq_mmu(CPUArchState *env, target_ulong addr, TCGMemOpIdx oi,
+                           uintptr_t retaddr);
 tcg_target_ulong helper_be_lduw_mmu(CPUArchState *env, target_ulong addr,
                                     TCGMemOpIdx oi, uintptr_t retaddr);
 tcg_target_ulong helper_be_ldul_mmu(CPUArchState *env, target_ulong addr,
                                     TCGMemOpIdx oi, uintptr_t retaddr);
-uint64_t helper_be_ldq_mmu(CPUArchState *env, target_ulong addr,
-                           TCGMemOpIdx oi, uintptr_t retaddr);
+uint64_t helper_be_ldq_mmu(CPUArchState *env, target_ulong addr, TCGMemOpIdx oi,
+                           uintptr_t retaddr);
 
 /* Value sign-extended to tcg register size.  */
 tcg_target_ulong helper_ret_ldsb_mmu(CPUArchState *env, target_ulong addr,
@@ -1440,25 +1459,25 @@ void helper_be_stq_mmu(CPUArchState *env, target_ulong addr, uint64_t val,
 
 /* Temporary aliases until backends are converted.  */
 #ifdef TARGET_WORDS_BIGENDIAN
-# define helper_ret_ldsw_mmu  helper_be_ldsw_mmu
-# define helper_ret_lduw_mmu  helper_be_lduw_mmu
-# define helper_ret_ldsl_mmu  helper_be_ldsl_mmu
-# define helper_ret_ldul_mmu  helper_be_ldul_mmu
-# define helper_ret_ldl_mmu   helper_be_ldul_mmu
-# define helper_ret_ldq_mmu   helper_be_ldq_mmu
-# define helper_ret_stw_mmu   helper_be_stw_mmu
-# define helper_ret_stl_mmu   helper_be_stl_mmu
-# define helper_ret_stq_mmu   helper_be_stq_mmu
+#define helper_ret_ldsw_mmu helper_be_ldsw_mmu
+#define helper_ret_lduw_mmu helper_be_lduw_mmu
+#define helper_ret_ldsl_mmu helper_be_ldsl_mmu
+#define helper_ret_ldul_mmu helper_be_ldul_mmu
+#define helper_ret_ldl_mmu helper_be_ldul_mmu
+#define helper_ret_ldq_mmu helper_be_ldq_mmu
+#define helper_ret_stw_mmu helper_be_stw_mmu
+#define helper_ret_stl_mmu helper_be_stl_mmu
+#define helper_ret_stq_mmu helper_be_stq_mmu
 #else
-# define helper_ret_ldsw_mmu  helper_le_ldsw_mmu
-# define helper_ret_lduw_mmu  helper_le_lduw_mmu
-# define helper_ret_ldsl_mmu  helper_le_ldsl_mmu
-# define helper_ret_ldul_mmu  helper_le_ldul_mmu
-# define helper_ret_ldl_mmu   helper_le_ldul_mmu
-# define helper_ret_ldq_mmu   helper_le_ldq_mmu
-# define helper_ret_stw_mmu   helper_le_stw_mmu
-# define helper_ret_stl_mmu   helper_le_stl_mmu
-# define helper_ret_stq_mmu   helper_le_stq_mmu
+#define helper_ret_ldsw_mmu helper_le_ldsw_mmu
+#define helper_ret_lduw_mmu helper_le_lduw_mmu
+#define helper_ret_ldsl_mmu helper_le_ldsl_mmu
+#define helper_ret_ldul_mmu helper_le_ldul_mmu
+#define helper_ret_ldl_mmu helper_le_ldul_mmu
+#define helper_ret_ldq_mmu helper_le_ldq_mmu
+#define helper_ret_stw_mmu helper_le_stw_mmu
+#define helper_ret_stl_mmu helper_le_stl_mmu
+#define helper_ret_stq_mmu helper_le_stq_mmu
 #endif
 
 uint32_t helper_atomic_cmpxchgb_mmu(CPUArchState *env, target_ulong addr,
@@ -1483,26 +1502,26 @@ uint64_t helper_atomic_cmpxchgq_be_mmu(CPUArchState *env, target_ulong addr,
                                        uint64_t cmpv, uint64_t newv,
                                        TCGMemOpIdx oi, uintptr_t retaddr);
 
-#define GEN_ATOMIC_HELPER(NAME, TYPE, SUFFIX)         \
-TYPE helper_atomic_ ## NAME ## SUFFIX ## _mmu         \
-    (CPUArchState *env, target_ulong addr, TYPE val,  \
-     TCGMemOpIdx oi, uintptr_t retaddr);
+#define GEN_ATOMIC_HELPER(NAME, TYPE, SUFFIX)                                  \
+    TYPE helper_atomic_##NAME##SUFFIX##_mmu(                                   \
+        CPUArchState *env, target_ulong addr, TYPE val, TCGMemOpIdx oi,        \
+        uintptr_t retaddr);
 
 #ifdef CONFIG_ATOMIC64
-#define GEN_ATOMIC_HELPER_ALL(NAME)          \
-    GEN_ATOMIC_HELPER(NAME, uint32_t, b)     \
-    GEN_ATOMIC_HELPER(NAME, uint32_t, w_le)  \
-    GEN_ATOMIC_HELPER(NAME, uint32_t, w_be)  \
-    GEN_ATOMIC_HELPER(NAME, uint32_t, l_le)  \
-    GEN_ATOMIC_HELPER(NAME, uint32_t, l_be)  \
-    GEN_ATOMIC_HELPER(NAME, uint64_t, q_le)  \
+#define GEN_ATOMIC_HELPER_ALL(NAME)                                            \
+    GEN_ATOMIC_HELPER(NAME, uint32_t, b)                                       \
+    GEN_ATOMIC_HELPER(NAME, uint32_t, w_le)                                    \
+    GEN_ATOMIC_HELPER(NAME, uint32_t, w_be)                                    \
+    GEN_ATOMIC_HELPER(NAME, uint32_t, l_le)                                    \
+    GEN_ATOMIC_HELPER(NAME, uint32_t, l_be)                                    \
+    GEN_ATOMIC_HELPER(NAME, uint64_t, q_le)                                    \
     GEN_ATOMIC_HELPER(NAME, uint64_t, q_be)
 #else
-#define GEN_ATOMIC_HELPER_ALL(NAME)          \
-    GEN_ATOMIC_HELPER(NAME, uint32_t, b)     \
-    GEN_ATOMIC_HELPER(NAME, uint32_t, w_le)  \
-    GEN_ATOMIC_HELPER(NAME, uint32_t, w_be)  \
-    GEN_ATOMIC_HELPER(NAME, uint32_t, l_le)  \
+#define GEN_ATOMIC_HELPER_ALL(NAME)                                            \
+    GEN_ATOMIC_HELPER(NAME, uint32_t, b)                                       \
+    GEN_ATOMIC_HELPER(NAME, uint32_t, w_le)                                    \
+    GEN_ATOMIC_HELPER(NAME, uint32_t, w_be)                                    \
+    GEN_ATOMIC_HELPER(NAME, uint32_t, l_le)                                    \
     GEN_ATOMIC_HELPER(NAME, uint32_t, l_be)
 #endif
 
@@ -1540,11 +1559,11 @@ GEN_ATOMIC_HELPER_ALL(xchg)
  * as defined by <qemu/atomic128.h>.
  */
 Int128 helper_atomic_cmpxchgo_le_mmu(CPUArchState *env, target_ulong addr,
-                                     Int128 cmpv, Int128 newv,
-                                     TCGMemOpIdx oi, uintptr_t retaddr);
+                                     Int128 cmpv, Int128 newv, TCGMemOpIdx oi,
+                                     uintptr_t retaddr);
 Int128 helper_atomic_cmpxchgo_be_mmu(CPUArchState *env, target_ulong addr,
-                                     Int128 cmpv, Int128 newv,
-                                     TCGMemOpIdx oi, uintptr_t retaddr);
+                                     Int128 cmpv, Int128 newv, TCGMemOpIdx oi,
+                                     uintptr_t retaddr);
 
 Int128 helper_atomic_ldo_le_mmu(CPUArchState *env, target_ulong addr,
                                 TCGMemOpIdx oi, uintptr_t retaddr);
@@ -1558,7 +1577,7 @@ void helper_atomic_sto_be_mmu(CPUArchState *env, target_ulong addr, Int128 val,
 #ifdef CONFIG_DEBUG_TCG
 void tcg_assert_listed_vecop(TCGOpcode);
 #else
-static inline void tcg_assert_listed_vecop(TCGOpcode op) { }
+static inline void tcg_assert_listed_vecop(TCGOpcode op) {}
 #endif
 
 static inline const TCGOpcode *tcg_swap_vecop_list(const TCGOpcode *n)
@@ -1572,7 +1591,8 @@ static inline const TCGOpcode *tcg_swap_vecop_list(const TCGOpcode *n)
 #endif
 }
 
-bool tcg_can_emit_vecop_list(TCGContext *tcg_ctx, const TCGOpcode *, TCGType, unsigned);
+bool tcg_can_emit_vecop_list(TCGContext *tcg_ctx, const TCGOpcode *, TCGType,
+                             unsigned);
 
 void check_exit_request(TCGContext *tcg_ctx);
 
@@ -1586,13 +1606,14 @@ struct jit_code_entry {
 };
 
 void uc_del_inline_hook(uc_engine *uc, struct hook *hk);
-void uc_add_inline_hook(uc_engine *uc, struct hook *hk, void** args, int args_len);
+void uc_add_inline_hook(uc_engine *uc, struct hook *hk, void **args,
+                        int args_len);
 
 static inline bool tcg_uc_has_hookmem(TCGContext *s)
 {
     return HOOK_EXISTS(s->uc, UC_HOOK_MEM_READ) ||
-        HOOK_EXISTS(s->uc, UC_HOOK_MEM_READ_AFTER) ||
-        HOOK_EXISTS(s->uc, UC_HOOK_MEM_WRITE);
+           HOOK_EXISTS(s->uc, UC_HOOK_MEM_READ_AFTER) ||
+           HOOK_EXISTS(s->uc, UC_HOOK_MEM_WRITE);
 }
 
 #endif /* TCG_H */

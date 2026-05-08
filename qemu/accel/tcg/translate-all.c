@@ -36,8 +36,8 @@
 #include "sysemu/tcg.h"
 #include "uc_priv.h"
 
-static bool tb_exec_is_locked(struct uc_struct*);
-static void tb_exec_change(struct uc_struct*, bool locked);
+static bool tb_exec_is_locked(struct uc_struct *);
+static void tb_exec_change(struct uc_struct *, bool locked);
 
 /* #define DEBUG_TB_INVALIDATE */
 /* #define DEBUG_TB_FLUSH */
@@ -129,23 +129,23 @@ struct page_collection {
 };
 
 /* list iterators for lists of tagged pointers in TranslationBlock */
-#define TB_FOR_EACH_TAGGED(head, tb, n, field)                          \
-    for (n = (head) & 1, tb = (TranslationBlock *)((head) & ~1);        \
-         tb; tb = (TranslationBlock *)tb->field[n], n = (uintptr_t)tb & 1, \
-             tb = (TranslationBlock *)((uintptr_t)tb & ~1))
+#define TB_FOR_EACH_TAGGED(head, tb, n, field)                                 \
+    for (n = (head) & 1, tb = (TranslationBlock *)((head) & ~1); tb;           \
+         tb = (TranslationBlock *)tb->field[n], n = (uintptr_t)tb & 1,         \
+        tb = (TranslationBlock *)((uintptr_t)tb & ~1))
 
-#define PAGE_FOR_EACH_TB(pagedesc, tb, n)                       \
+#define PAGE_FOR_EACH_TB(pagedesc, tb, n)                                      \
     TB_FOR_EACH_TAGGED((pagedesc)->first_tb, tb, n, page_next)
 
-#define TB_FOR_EACH_JMP(head_tb, tb, n)                                 \
+#define TB_FOR_EACH_JMP(head_tb, tb, n)                                        \
     TB_FOR_EACH_TAGGED((head_tb)->jmp_list_head, tb, n, jmp_list_next)
 
 /* In system mode we want L1_MAP to be based on ram offsets,
    while in user mode we want it to be based on virtual addresses.  */
 #if HOST_LONG_BITS < TARGET_PHYS_ADDR_SPACE_BITS
-# define L1_MAP_ADDR_SPACE_BITS  HOST_LONG_BITS
+#define L1_MAP_ADDR_SPACE_BITS HOST_LONG_BITS
 #else
-# define L1_MAP_ADDR_SPACE_BITS  TARGET_PHYS_ADDR_SPACE_BITS
+#define L1_MAP_ADDR_SPACE_BITS TARGET_PHYS_ADDR_SPACE_BITS
 #endif
 
 /* Size of the L2 (and L3, etc) page tables.  */
@@ -154,8 +154,8 @@ struct page_collection {
 
 /* Make sure all possible CPU event bits fit in tb->trace_vcpu_dstate */
 QEMU_BUILD_BUG_ON(CPU_TRACE_DSTATE_MAX_EVENTS >
-                  sizeof_field(TranslationBlock, trace_vcpu_dstate)
-                  * BITS_PER_BYTE);
+                  sizeof_field(TranslationBlock, trace_vcpu_dstate) *
+                      BITS_PER_BYTE);
 
 /* The bottom level has pointers to PageDesc, and is indexed by
  * anything from 4 to (V_L2_BITS + 3) bits, depending on target page size.
@@ -193,8 +193,8 @@ static uint8_t *encode_sleb128(uint8_t *p, target_long val)
     do {
         byte = val & 0x7f;
         val >>= 7;
-        more = !((val == 0 && (byte & 0x40) == 0)
-                 || (val == -1 && (byte & 0x40) != 0));
+        more = !((val == 0 && (byte & 0x40) == 0) ||
+                 (val == -1 && (byte & 0x40) != 0));
         if (more) {
             byte |= 0x80;
         }
@@ -241,7 +241,8 @@ static target_long decode_sleb128(uint8_t **pp)
    That is, the first column is seeded with the guest pc, the last column
    with the host pc, and the middle columns with zeros.  */
 
-static int encode_search(struct uc_struct *uc, TranslationBlock *tb, uint8_t *block)
+static int encode_search(struct uc_struct *uc, TranslationBlock *tb,
+                         uint8_t *block)
 {
     TCGContext *tcg_ctx = uc->tcg_ctx;
     uint8_t *highwater = tcg_ctx->code_gen_highwater;
@@ -281,7 +282,7 @@ static int encode_search(struct uc_struct *uc, TranslationBlock *tb, uint8_t *bl
 static int cpu_restore_state_from_tb(CPUState *cpu, TranslationBlock *tb,
                                      uintptr_t searched_pc, bool reset_icount)
 {
-    target_ulong data[TARGET_INSN_START_WORDS] = { tb->pc };
+    target_ulong data[TARGET_INSN_START_WORDS] = {tb->pc};
     uintptr_t host_pc = (uintptr_t)tb->tc.ptr;
     CPUArchState *env = cpu->env_ptr;
     uint8_t *p = (uint8_t *)tb->tc.ptr + tb->tc.size;
@@ -306,7 +307,7 @@ static int cpu_restore_state_from_tb(CPUState *cpu, TranslationBlock *tb,
     }
     return -1;
 
- found:
+found:
     if (reset_icount && (tb_cflags(tb) & CF_USE_ICOUNT)) {
         /* Reset the cycle counter to the start of the block
            and shift if to the number of actually executed instructions */
@@ -338,7 +339,7 @@ bool cpu_restore_state(CPUState *cpu, uintptr_t host_pc, bool will_exit)
      * tcg_init_ctx.code_gen_buffer check_offset will wrap to way
      * above the code_gen_buffer_size
      */
-    check_offset = host_pc - (uintptr_t) uc->tcg_ctx->code_gen_buffer;
+    check_offset = host_pc - (uintptr_t)uc->tcg_ctx->code_gen_buffer;
 
     if (check_offset < uc->tcg_ctx->code_gen_buffer_size) {
         tb = tcg_tb_lookup(tcg_ctx, host_pc);
@@ -362,7 +363,8 @@ static void page_init(struct uc_struct *uc)
     page_table_config_init(uc);
 }
 
-static PageDesc *page_find_alloc(struct uc_struct *uc, tb_page_addr_t index, int alloc)
+static PageDesc *page_find_alloc(struct uc_struct *uc, tb_page_addr_t index,
+                                 int alloc)
 {
     PageDesc *pd;
     void **lp;
@@ -421,8 +423,9 @@ static inline PageDesc *page_find(struct uc_struct *uc, tb_page_addr_t index)
     return page_find_alloc(uc, index, 0);
 }
 
-static void page_lock_pair(struct uc_struct *uc, PageDesc **ret_p1, tb_page_addr_t phys1,
-                           PageDesc **ret_p2, tb_page_addr_t phys2, int alloc);
+static void page_lock_pair(struct uc_struct *uc, PageDesc **ret_p1,
+                           tb_page_addr_t phys1, PageDesc **ret_p2,
+                           tb_page_addr_t phys2, int alloc);
 
 #ifdef CONFIG_DEBUG_TCG
 
@@ -460,13 +463,13 @@ static void page_unlock__debug(const PageDesc *pd)
     g_assert(removed);
 }
 
-static void
-do_assert_page_locked(const PageDesc *pd, const char *file, int line)
+static void do_assert_page_locked(const PageDesc *pd, const char *file,
+                                  int line)
 {
     if (unlikely(!page_is_locked(pd))) {
         // error_report("assert_page_lock: PageDesc %p not locked @ %s:%d",
         //              pd, file, line);
-        abort();    // unreachable in unicorn.
+        abort(); // unreachable in unicorn.
     }
 }
 
@@ -482,13 +485,9 @@ void assert_no_pages_locked(void)
 
 #define assert_page_locked(pd)
 
-static inline void page_lock__debug(const PageDesc *pd)
-{
-}
+static inline void page_lock__debug(const PageDesc *pd) {}
 
-static inline void page_unlock__debug(const PageDesc *pd)
-{
-}
+static inline void page_unlock__debug(const PageDesc *pd) {}
 
 #endif /* CONFIG_DEBUG_TCG */
 
@@ -503,12 +502,14 @@ static inline void page_unlock(PageDesc *pd)
 }
 
 /* lock the page(s) of a TB in the correct acquisition order */
-static inline void page_lock_tb(struct uc_struct *uc, const TranslationBlock *tb)
+static inline void page_lock_tb(struct uc_struct *uc,
+                                const TranslationBlock *tb)
 {
     page_lock_pair(uc, NULL, tb->page_addr[0], NULL, tb->page_addr[1], 0);
 }
 
-static inline void page_unlock_tb(struct uc_struct *uc, const TranslationBlock *tb)
+static inline void page_unlock_tb(struct uc_struct *uc,
+                                  const TranslationBlock *tb)
 {
     PageDesc *p1 = page_find(uc, tb->page_addr[0] >> TARGET_PAGE_BITS);
 
@@ -641,8 +642,9 @@ static gint tb_page_addr_cmp(gconstpointer ap, gconstpointer bp, gpointer udata)
  * intersecting TBs.
  * Locking order: acquire locks in ascending order of page index.
  */
-struct page_collection *
-page_collection_lock(struct uc_struct *uc, tb_page_addr_t start, tb_page_addr_t end)
+struct page_collection *page_collection_lock(struct uc_struct *uc,
+                                             tb_page_addr_t start,
+                                             tb_page_addr_t end)
 {
 #if 0
     struct page_collection *set = g_malloc(sizeof(*set));
@@ -699,8 +701,9 @@ void page_collection_unlock(struct page_collection *set)
 #endif
 }
 
-static void page_lock_pair(struct uc_struct *uc, PageDesc **ret_p1, tb_page_addr_t phys1,
-                           PageDesc **ret_p2, tb_page_addr_t phys2, int alloc)
+static void page_lock_pair(struct uc_struct *uc, PageDesc **ret_p1,
+                           tb_page_addr_t phys1, PageDesc **ret_p2,
+                           tb_page_addr_t phys2, int alloc)
 {
     PageDesc *p1, *p2;
     tb_page_addr_t page1;
@@ -741,30 +744,30 @@ static void page_lock_pair(struct uc_struct *uc, PageDesc **ret_p1, tb_page_addr
 
 /* Minimum size of the code gen buffer.  This number is randomly chosen,
    but not so small that we can't have a fair number of TB's live.  */
-#define MIN_CODE_GEN_BUFFER_SIZE     (1 * MiB)
+#define MIN_CODE_GEN_BUFFER_SIZE (1 * MiB)
 
 /* Maximum size of the code gen buffer we'd like to use.  Unless otherwise
    indicated, this is constrained by the range of direct branches on the
    host cpu, as used by the TCG implementation of goto_tb.  */
 #if defined(__x86_64__)
-# define MAX_CODE_GEN_BUFFER_SIZE  (2 * GiB)
+#define MAX_CODE_GEN_BUFFER_SIZE (2 * GiB)
 #elif defined(__sparc__)
-# define MAX_CODE_GEN_BUFFER_SIZE  (2 * GiB)
+#define MAX_CODE_GEN_BUFFER_SIZE (2 * GiB)
 #elif defined(__powerpc64__)
-# define MAX_CODE_GEN_BUFFER_SIZE  (2 * GiB)
+#define MAX_CODE_GEN_BUFFER_SIZE (2 * GiB)
 #elif defined(__powerpc__)
-# define MAX_CODE_GEN_BUFFER_SIZE  (32 * MiB)
+#define MAX_CODE_GEN_BUFFER_SIZE (32 * MiB)
 #elif defined(__aarch64__)
-# define MAX_CODE_GEN_BUFFER_SIZE  (2 * GiB)
+#define MAX_CODE_GEN_BUFFER_SIZE (2 * GiB)
 #elif defined(__s390x__)
-  /* We have a +- 4GB range on the branches; leave some slop.  */
-# define MAX_CODE_GEN_BUFFER_SIZE  (3 * GiB)
+/* We have a +- 4GB range on the branches; leave some slop.  */
+#define MAX_CODE_GEN_BUFFER_SIZE (3 * GiB)
 #elif defined(__mips__)
-  /* We have a 256MB branch region, but leave room to make sure the
-     main executable is also within that region.  */
-# define MAX_CODE_GEN_BUFFER_SIZE  (128 * MiB)
+/* We have a 256MB branch region, but leave room to make sure the
+   main executable is also within that region.  */
+#define MAX_CODE_GEN_BUFFER_SIZE (128 * MiB)
 #else
-# define MAX_CODE_GEN_BUFFER_SIZE  ((size_t)-1)
+#define MAX_CODE_GEN_BUFFER_SIZE ((size_t)-1)
 #endif
 
 #if TCG_TARGET_REG_BITS == 32
@@ -778,9 +781,10 @@ static void page_lock_pair(struct uc_struct *uc, PageDesc **ret_p1, tb_page_addr
 #define DEFAULT_CODE_GEN_BUFFER_SIZE_1 (1 * GiB)
 #endif
 
-#define DEFAULT_CODE_GEN_BUFFER_SIZE \
-  (DEFAULT_CODE_GEN_BUFFER_SIZE_1 < MAX_CODE_GEN_BUFFER_SIZE \
-   ? DEFAULT_CODE_GEN_BUFFER_SIZE_1 : MAX_CODE_GEN_BUFFER_SIZE)
+#define DEFAULT_CODE_GEN_BUFFER_SIZE                                           \
+    (DEFAULT_CODE_GEN_BUFFER_SIZE_1 < MAX_CODE_GEN_BUFFER_SIZE                 \
+         ? DEFAULT_CODE_GEN_BUFFER_SIZE_1                                      \
+         : MAX_CODE_GEN_BUFFER_SIZE)
 
 static inline size_t size_code_gen_buffer(size_t tb_size)
 {
@@ -808,7 +812,8 @@ static inline bool cross_256mb(void *addr, size_t size)
 /* We weren't able to allocate a buffer without crossing that boundary,
    so make do with the larger portion of the buffer that doesn't cross.
    Returns the new base of the buffer, and adjusts code_gen_buffer_size.  */
-static inline void *split_cross_256mb(TCGContext *tcg_ctx, void *buf1, size_t size1)
+static inline void *split_cross_256mb(TCGContext *tcg_ctx, void *buf1,
+                                      size_t size1)
 {
     void *buf2 = (void *)(((uintptr_t)buf1 + size1) & ~0x0ffffffful);
     size_t size2 = buf1 + size1 - buf2;
@@ -867,24 +872,26 @@ static inline void *alloc_code_gen_buffer(struct uc_struct *uc)
 #define CLOSURE_SIZE (4096)
 
 #ifdef _WIN64
-static LONG code_gen_buffer_handler(PEXCEPTION_POINTERS ptr, struct uc_struct *uc)
+static LONG code_gen_buffer_handler(PEXCEPTION_POINTERS ptr,
+                                    struct uc_struct *uc)
 #else
 /*
 The first two DWORD or smaller arguments that are found in the argument list
 from left to right are passed in ECX and EDX registers; all other arguments
 are passed on the stack from right to left.
 */
-static LONG __fastcall code_gen_buffer_handler(PEXCEPTION_POINTERS ptr, struct uc_struct* uc)
+static LONG __fastcall code_gen_buffer_handler(PEXCEPTION_POINTERS ptr,
+                                               struct uc_struct *uc)
 #endif
 {
     PEXCEPTION_RECORD record = ptr->ExceptionRecord;
     if (record->ExceptionCode == EXCEPTION_ACCESS_VIOLATION) {
-        uint8_t* base = (uint8_t*)(record->ExceptionInformation[1]);
-        uint8_t* left = uc->tcg_ctx->initial_buffer;
-        uint8_t* right = left + uc->tcg_ctx->initial_buffer_size;
+        uint8_t *base = (uint8_t *)(record->ExceptionInformation[1]);
+        uint8_t *left = uc->tcg_ctx->initial_buffer;
+        uint8_t *right = left + uc->tcg_ctx->initial_buffer_size;
         if (left && base >= left && base < right) {
             // It's our region
-            uint8_t* base_end = base + COMMIT_COUNT * 4096;
+            uint8_t *base_end = base + COMMIT_COUNT * 4096;
             uint32_t size = COMMIT_COUNT * 4096;
             if (base_end >= right) {
                 size = base_end - base;
@@ -900,7 +907,8 @@ static LONG __fastcall code_gen_buffer_handler(PEXCEPTION_POINTERS ptr, struct u
     return EXCEPTION_CONTINUE_SEARCH;
 }
 
-static inline void may_remove_handler(struct uc_struct *uc) {
+static inline void may_remove_handler(struct uc_struct *uc)
+{
     if (uc->seh_closure) {
         if (uc->seh_handle) {
             RemoveVectoredExceptionHandler(uc->seh_handle);
@@ -915,18 +923,19 @@ static inline void *alloc_code_gen_buffer(struct uc_struct *uc)
     size_t size = tcg_ctx->code_gen_buffer_size;
     uint8_t *closure, *data;
     uint8_t *ptr;
-    void* handler = code_gen_buffer_handler;
+    void *handler = code_gen_buffer_handler;
 
-    may_remove_handler(uc);    
+    may_remove_handler(uc);
 
     // Naive trampoline implementation
-    closure = VirtualAlloc(NULL, CLOSURE_SIZE, MEM_RESERVE | MEM_COMMIT, PAGE_EXECUTE_READWRITE);
+    closure = VirtualAlloc(NULL, CLOSURE_SIZE, MEM_RESERVE | MEM_COMMIT,
+                           PAGE_EXECUTE_READWRITE);
     if (!closure) {
         return NULL;
     }
     uc->seh_closure = closure;
-    data = closure + CLOSURE_SIZE /2;
-    
+    data = closure + CLOSURE_SIZE / 2;
+
 #ifdef _WIN64
     ptr = closure;
     *ptr = 0x48; // REX.w
@@ -940,8 +949,9 @@ static inline void *alloc_code_gen_buffer(struct uc_struct *uc)
     // mov rdx, [rax+0x8] ; move uc pointer to 2nd arg
     // sub rsp, 0x10; reserve 2 slots as ms fastcall requires
     // call [rax + 0x10] ; go to handler
-    const char tramp[] = "\x48\x89\x10\x48\x8b\x50\x08\x48\x83\xec\x10\xff\x50\x10";
-    memcpy(ptr, (void*)tramp, sizeof(tramp) - 1); // Note last zero!
+    const char tramp[] =
+        "\x48\x89\x10\x48\x8b\x50\x08\x48\x83\xec\x10\xff\x50\x10";
+    memcpy(ptr, (void *)tramp, sizeof(tramp) - 1); // Note last zero!
     ptr += sizeof(tramp) - 1;
     *ptr = 0x48; // REX.w
     ptr += 1;
@@ -954,41 +964,44 @@ static inline void *alloc_code_gen_buffer(struct uc_struct *uc)
     // mov rdx, [rdx] ; restore rdx
     // ret
     const char tramp2[] = "\x48\x83\xc4\x10\x48\x8b\x12\xc3";
-    memcpy(ptr, (void*)tramp2, sizeof(tramp2) - 1);
+    memcpy(ptr, (void *)tramp2, sizeof(tramp2) - 1);
 
-    memcpy(data + 0x8,  (void*)&uc, 8);
-    memcpy(data + 0x10, (void*)&handler, 8);
+    memcpy(data + 0x8, (void *)&uc, 8);
+    memcpy(data + 0x10, (void *)&handler, 8);
 #else
     ptr = closure;
     *ptr = 0xb8; // mov eax
     ptr += 1;
-    memcpy(ptr, (void*)&data, 4); // mov eax, &data
+    memcpy(ptr, (void *)&data, 4); // mov eax, &data
     ptr += 4;
     // ; eax = &data
     // mov [eax], edx; save edx
     // mov [eax+0x4], ecx; save ecx
     // mov ecx, [esp+4]; get ptr to exception because of cdecl
     // mov edx, [eax+0x8]; get ptr to uc
-    // call [eax + 0xC]; get ptr to our handler, it's fastcall so we don't clean stac
-    const char tramp[] = "\x89\x10\x89\x48\x04\x8b\x4c\x24\x04\x8b\x50\x08\xff\x50\x0c";
-    memcpy(ptr, (void*)tramp, sizeof(tramp) - 1);
+    // call [eax + 0xC]; get ptr to our handler, it's fastcall so we don't clean
+    // stac
+    const char tramp[] =
+        "\x89\x10\x89\x48\x04\x8b\x4c\x24\x04\x8b\x50\x08\xff\x50\x0c";
+    memcpy(ptr, (void *)tramp, sizeof(tramp) - 1);
     ptr += sizeof(tramp) - 1;
     *ptr = 0xb9; // mov ecx
     ptr += 1;
-    memcpy(ptr, (void*)&data, 4); // mov ecx, &data
+    memcpy(ptr, (void *)&data, 4); // mov ecx, &data
     ptr += 4;
 
     // mov edx, [ecx] ; restore edx
     // mov ecx, [ecx+4] ; restore ecx
     // ret 4
     const char tramp2[] = "\x8b\x11\x8b\x49\x04\xc2\x04\x00";
-    memcpy(ptr, (void*)tramp2, sizeof(tramp2) - 1);
+    memcpy(ptr, (void *)tramp2, sizeof(tramp2) - 1);
 
-    memcpy(data + 0x8,  (void*)&uc, 4);
-    memcpy(data + 0xC, (void*)&handler, 4);
+    memcpy(data + 0x8, (void *)&uc, 4);
+    memcpy(data + 0xC, (void *)&handler, 4);
 #endif
 
-    uc->seh_handle = AddVectoredExceptionHandler(0, (PVECTORED_EXCEPTION_HANDLER)closure);
+    uc->seh_handle =
+        AddVectoredExceptionHandler(0, (PVECTORED_EXCEPTION_HANDLER)closure);
     if (!uc->seh_handle) {
         VirtualFree(uc->seh_closure, 0, MEM_RELEASE);
         uc->seh_closure = NULL;
@@ -1019,12 +1032,18 @@ void free_code_gen_buffer(struct uc_struct *uc)
 static inline void *alloc_code_gen_buffer(struct uc_struct *uc)
 {
     TCGContext *tcg_ctx = uc->tcg_ctx;
+#if CONFIG_TCG_INTERPRETER
+    int prot = PROT_WRITE | PROT_READ;
+#else
     int prot = PROT_WRITE | PROT_READ | PROT_EXEC;
+#endif
     int flags = MAP_PRIVATE | MAP_ANONYMOUS;
     size_t size = tcg_ctx->code_gen_buffer_size;
     void *buf;
-#ifdef USE_MAP_JIT
+#if !CONFIG_TCG_INTERPRETER
+#if defined USE_MAP_JIT
     flags |= MAP_JIT;
+#endif
 #endif
     buf = mmap(NULL, size, prot, flags, -1, 0);
     if (buf == MAP_FAILED) {
@@ -1091,13 +1110,11 @@ static bool tb_cmp(struct uc_struct *uc, const void *ap, const void *bp)
     const TranslationBlock *a = ap;
     const TranslationBlock *b = bp;
 
-    return a->pc == b->pc &&
-        a->cs_base == b->cs_base &&
-        a->flags == b->flags &&
-        (tb_cflags(a) & CF_HASH_MASK) == (tb_cflags(b) & CF_HASH_MASK) &&
-        a->trace_vcpu_dstate == b->trace_vcpu_dstate &&
-        a->page_addr[0] == b->page_addr[0] &&
-        a->page_addr[1] == b->page_addr[1];
+    return a->pc == b->pc && a->cs_base == b->cs_base && a->flags == b->flags &&
+           (tb_cflags(a) & CF_HASH_MASK) == (tb_cflags(b) & CF_HASH_MASK) &&
+           a->trace_vcpu_dstate == b->trace_vcpu_dstate &&
+           a->page_addr[0] == b->page_addr[0] &&
+           a->page_addr[1] == b->page_addr[1];
 }
 
 static void tb_htable_init(struct uc_struct *uc)
@@ -1107,14 +1124,15 @@ static void tb_htable_init(struct uc_struct *uc)
     qht_init(&uc->tcg_ctx->tb_ctx.htable, tb_cmp, CODE_GEN_HTABLE_SIZE, mode);
 }
 
-
-static void uc_tb_flush(struct uc_struct *uc) {
+static void uc_tb_flush(struct uc_struct *uc)
+{
     tb_exec_unlock(uc);
     tb_flush(uc->cpu);
     tb_exec_lock(uc);
 }
 
-static void uc_invalidate_tb(struct uc_struct *uc, uint64_t start_addr, size_t len) 
+static void uc_invalidate_tb(struct uc_struct *uc, uint64_t start_addr,
+                             size_t len)
 {
     tb_page_addr_t start, end;
 
@@ -1132,7 +1150,8 @@ static void uc_invalidate_tb(struct uc_struct *uc, uint64_t start_addr, size_t l
     // (GPA -> HVA via memory_region_get_ram_addr(mr) + GPA + block->host,
     // GVA -> GPA via tlb & softmmu
     // HVA -> HPA via host mmu)
-    start = get_page_addr_code(uc->cpu->env_ptr, start_addr) & (target_ulong)(-1);
+    start =
+        get_page_addr_code(uc->cpu->env_ptr, start_addr) & (target_ulong)(-1);
 
     uc->nested_level--;
 
@@ -1147,7 +1166,7 @@ static void uc_invalidate_tb(struct uc_struct *uc, uint64_t start_addr, size_t l
     tb_invalidate_phys_range(uc, start, end);
 }
 
-static uc_err uc_gen_tb(struct uc_struct *uc, uint64_t addr, uc_tb *out_tb) 
+static uc_err uc_gen_tb(struct uc_struct *uc, uint64_t addr, uc_tb *out_tb)
 {
     TranslationBlock *tb;
     target_ulong cs_base, pc;
@@ -1172,9 +1191,7 @@ static uc_err uc_gen_tb(struct uc_struct *uc, uint64_t addr, uc_tb *out_tb)
     cflags &= ~CF_CLUSTER_MASK;
     cflags |= ((uint32_t)cpu->cluster_index) << CF_CLUSTER_SHIFT;
 
-    if (unlikely(!(tb &&
-                   tb->pc == pc &&
-                   tb->cs_base == cs_base &&
+    if (unlikely(!(tb && tb->pc == pc && tb->cs_base == cs_base &&
                    tb->flags == flags &&
                    tb->trace_vcpu_dstate == *cpu->trace_dstate &&
                    (tb_cflags(tb) & (CF_HASH_MASK | CF_INVALID)) == cflags))) {
@@ -1371,13 +1388,15 @@ static void do_tb_flush(CPUState *cpu, run_on_cpu_data tb_flush_count)
     cpu_tb_jmp_cache_clear(cpu);
 #endif
 
-    qht_reset_size(cpu->uc, &cpu->uc->tcg_ctx->tb_ctx.htable, CODE_GEN_HTABLE_SIZE);
+    qht_reset_size(cpu->uc, &cpu->uc->tcg_ctx->tb_ctx.htable,
+                   CODE_GEN_HTABLE_SIZE);
     page_flush_tb(cpu->uc);
 
     tcg_region_reset_all(cpu->uc->tcg_ctx);
     /* XXX: flush processor icache at this point if cache flush is
        expensive */
-    cpu->uc->tcg_ctx->tb_ctx.tb_flush_count = cpu->uc->tcg_ctx->tb_ctx.tb_flush_count + 1;
+    cpu->uc->tcg_ctx->tb_ctx.tb_flush_count =
+        cpu->uc->tcg_ctx->tb_ctx.tb_flush_count + 1;
 
 done:
     mmap_unlock();
@@ -1401,7 +1420,8 @@ static inline void tb_page_remove(PageDesc *pd, TranslationBlock *tb)
 
     assert_page_locked(pd);
     pprev = &pd->first_tb;
-    PAGE_FOR_EACH_TB(pd, tb1, n1) {
+    PAGE_FOR_EACH_TB(pd, tb1, n1)
+    {
         if (tb1 == tb) {
             *pprev = tb1->page_next[n1];
             return;
@@ -1442,7 +1462,8 @@ static inline void tb_remove_from_jmp_list(TranslationBlock *orig, int n_orig)
      * we know for sure that @orig is in the jmp list.
      */
     pprev = &dest->jmp_list_head;
-    TB_FOR_EACH_JMP(dest, tb, n) {
+    TB_FOR_EACH_JMP(dest, tb, n)
+    {
         if (tb == orig && n == n_orig) {
             *pprev = tb->jmp_list_next[n];
             /* no need to set orig->jmp_dest[n]; setting the LSB was enough */
@@ -1467,7 +1488,8 @@ static inline void tb_jmp_unlink(TranslationBlock *dest)
     TranslationBlock *tb;
     int n;
 
-    TB_FOR_EACH_JMP(dest, tb, n) {
+    TB_FOR_EACH_JMP(dest, tb, n)
+    {
         tb_reset_jump(tb, n);
 #ifdef _MSC_VER
         atomic_and((long *)&tb->jmp_dest[n], (uintptr_t)NULL | 1);
@@ -1484,7 +1506,8 @@ static inline void tb_jmp_unlink(TranslationBlock *dest)
  * In !user-mode, if @rm_from_page_list is set, call with the TB's pages'
  * locks held.
  */
-static void do_tb_phys_invalidate(TCGContext *tcg_ctx, TranslationBlock *tb, bool rm_from_page_list)
+static void do_tb_phys_invalidate(TCGContext *tcg_ctx, TranslationBlock *tb,
+                                  bool rm_from_page_list)
 {
     CPUState *cpu = tcg_ctx->uc->cpu;
     struct uc_struct *uc = tcg_ctx->uc;
@@ -1540,7 +1563,8 @@ static void do_tb_phys_invalidate(TCGContext *tcg_ctx, TranslationBlock *tb, boo
     tb_exec_change(uc, code_gen_locked);
 }
 
-static void tb_phys_invalidate__locked(TCGContext *tcg_ctx, TranslationBlock *tb)
+static void tb_phys_invalidate__locked(TCGContext *tcg_ctx,
+                                       TranslationBlock *tb)
 {
     do_tb_phys_invalidate(tcg_ctx, tb, true);
 }
@@ -1549,7 +1573,8 @@ static void tb_phys_invalidate__locked(TCGContext *tcg_ctx, TranslationBlock *tb
  *
  * Called with mmap_lock held in user-mode.
  */
-void tb_phys_invalidate(TCGContext *tcg_ctx, TranslationBlock *tb, tb_page_addr_t page_addr)
+void tb_phys_invalidate(TCGContext *tcg_ctx, TranslationBlock *tb,
+                        tb_page_addr_t page_addr)
 {
     if (page_addr == -1 && tb->page_addr[0] != -1) {
         page_lock_tb(tcg_ctx->uc, tb);
@@ -1569,7 +1594,8 @@ static void build_page_bitmap(struct uc_struct *uc, PageDesc *p)
     assert_page_locked(p);
     p->code_bitmap = bitmap_new(TARGET_PAGE_SIZE);
 
-    PAGE_FOR_EACH_TB(p, tb, n) {
+    PAGE_FOR_EACH_TB(p, tb, n)
+    {
         /* NOTE: this is subtle as a TB may span two physical pages */
         if (n == 0) {
             /* NOTE: tb_end may be after the end of the page, but
@@ -1578,7 +1604,7 @@ static void build_page_bitmap(struct uc_struct *uc, PageDesc *p)
             tb_end = tb_start + tb->size;
             if (tb_end > TARGET_PAGE_SIZE) {
                 tb_end = TARGET_PAGE_SIZE;
-             }
+            }
         } else {
             tb_start = 0;
             tb_end = ((tb->pc + tb->size) & ~TARGET_PAGE_MASK);
@@ -1592,8 +1618,9 @@ static void build_page_bitmap(struct uc_struct *uc, PageDesc *p)
  * Called with mmap_lock held for user-mode emulation.
  * Called with @p->lock held in !user-mode.
  */
-static inline void tb_page_add(struct uc_struct *uc, PageDesc *p, TranslationBlock *tb,
-                               unsigned int n, tb_page_addr_t page_addr)
+static inline void tb_page_add(struct uc_struct *uc, PageDesc *p,
+                               TranslationBlock *tb, unsigned int n,
+                               tb_page_addr_t page_addr)
 {
     bool page_already_protected;
 
@@ -1623,9 +1650,10 @@ static inline void tb_page_add(struct uc_struct *uc, PageDesc *p, TranslationBlo
  * for the same block of guest code that @tb corresponds to. In that case,
  * the caller should discard the original @tb, and use instead the returned TB.
  */
-static TranslationBlock *
-tb_link_page(struct uc_struct *uc, TranslationBlock *tb, tb_page_addr_t phys_pc,
-             tb_page_addr_t phys_page2)
+static TranslationBlock *tb_link_page(struct uc_struct *uc,
+                                      TranslationBlock *tb,
+                                      tb_page_addr_t phys_pc,
+                                      tb_page_addr_t phys_page2)
 {
     PageDesc *p;
     PageDesc *p2 = NULL;
@@ -1666,7 +1694,7 @@ tb_link_page(struct uc_struct *uc, TranslationBlock *tb, tb_page_addr_t phys_pc,
         /* add in the hash table */
         h = tb_hash_func(phys_pc, tb->pc, tb->flags, tb->cflags & CF_HASH_MASK,
                          tb->trace_vcpu_dstate);
-        tb->hash = h;   // unicorn needs this so it can remove this tb
+        tb->hash = h; // unicorn needs this so it can remove this tb
         qht_insert(uc, &uc->tcg_ctx->tb_ctx.htable, tb, h, &existing_tb);
 
         /* remove TB from the page(s) if we couldn't insert it */
@@ -1690,9 +1718,8 @@ tb_link_page(struct uc_struct *uc, TranslationBlock *tb, tb_page_addr_t phys_pc,
 }
 
 /* Called with mmap_lock held for user mode emulation.  */
-TranslationBlock *tb_gen_code(CPUState *cpu,
-                              target_ulong pc, target_ulong cs_base,
-                              uint32_t flags, int cflags)
+TranslationBlock *tb_gen_code(CPUState *cpu, target_ulong pc,
+                              target_ulong cs_base, uint32_t flags, int cflags)
 {
 #ifdef TARGET_ARM
     struct uc_struct *uc = cpu->uc;
@@ -1730,7 +1757,7 @@ TranslationBlock *tb_gen_code(CPUState *cpu,
         max_insns = 1;
     }
 
- buffer_overflow:
+buffer_overflow:
     tb = tcg_tb_alloc(tcg_ctx);
     if (unlikely(!tb)) {
         /* flush must be done */
@@ -1750,14 +1777,15 @@ TranslationBlock *tb_gen_code(CPUState *cpu,
     tb->orig_tb = NULL;
     tb->trace_vcpu_dstate = *cpu->trace_dstate;
     tcg_ctx->tb_cflags = cflags;
- tb_overflow:
+tb_overflow:
 
     tcg_func_start(tcg_ctx);
 
     tcg_ctx->cpu = env_cpu(env);
     UC_TRACE_START(UC_TRACE_TB_TRANS);
     gen_intermediate_code(cpu, tb, max_insns);
-    UC_TRACE_END(UC_TRACE_TB_TRANS, "[uc] translate tb 0x%" PRIx64 ": ", tb->pc);
+    UC_TRACE_END(UC_TRACE_TB_TRANS, "[uc] translate tb 0x%" PRIx64 ": ",
+                 tb->pc);
     tcg_ctx->cpu = NULL;
 
     /* generate machine code */
@@ -1806,15 +1834,15 @@ TranslationBlock *tb_gen_code(CPUState *cpu,
             g_assert_not_reached();
         }
     }
-    search_size = encode_search(cpu->uc, tb, (uint8_t *)gen_code_buf + gen_code_size);
+    search_size =
+        encode_search(cpu->uc, tb, (uint8_t *)gen_code_buf + gen_code_size);
     if (unlikely(search_size < 0)) {
         goto buffer_overflow;
     }
     tb->tc.size = gen_code_size;
 
-    tcg_ctx->code_gen_ptr = (void *)
-        ROUND_UP((uintptr_t)gen_code_buf + gen_code_size + search_size,
-                 CODE_GEN_ALIGN);
+    tcg_ctx->code_gen_ptr = (void *)ROUND_UP(
+        (uintptr_t)gen_code_buf + gen_code_size + search_size, CODE_GEN_ALIGN);
 
     /* init jump list */
     tb->jmp_list_head = (uintptr_t)NULL;
@@ -1841,7 +1869,7 @@ TranslationBlock *tb_gen_code(CPUState *cpu,
     /* Undoes tlb_set_dirty in notdirty_write. */
     if (!uc_mem_hook_installed(cpu->uc, tb->pc)) {
         tlb_reset_dirty_by_vaddr(cpu, pc & TARGET_PAGE_MASK,
-                                (pc & ~TARGET_PAGE_MASK) + tb->size);
+                                 (pc & ~TARGET_PAGE_MASK) + tb->size);
     }
 
     /*
@@ -1853,7 +1881,8 @@ TranslationBlock *tb_gen_code(CPUState *cpu,
     if (unlikely(existing_tb != tb)) {
         uintptr_t orig_aligned = (uintptr_t)gen_code_buf;
 
-        orig_aligned -= ROUND_UP(sizeof(*tb), tcg_ctx->uc->qemu_icache_linesize);
+        orig_aligned -=
+            ROUND_UP(sizeof(*tb), tcg_ctx->uc->qemu_icache_linesize);
         tcg_ctx->code_gen_ptr = (void *)orig_aligned;
         return existing_tb;
     }
@@ -1866,11 +1895,9 @@ TranslationBlock *tb_gen_code(CPUState *cpu,
  * user-mode: call with mmap_lock held.
  * !user-mode: call with all @pages locked.
  */
-static void
-tb_invalidate_phys_page_range__locked(struct uc_struct *uc, struct page_collection *pages,
-                                      PageDesc *p, tb_page_addr_t start,
-                                      tb_page_addr_t end,
-                                      uintptr_t retaddr)
+static void tb_invalidate_phys_page_range__locked(
+    struct uc_struct *uc, struct page_collection *pages, PageDesc *p,
+    tb_page_addr_t start, tb_page_addr_t end, uintptr_t retaddr)
 {
     TranslationBlock *tb;
     tb_page_addr_t tb_start, tb_end;
@@ -1897,7 +1924,8 @@ tb_invalidate_phys_page_range__locked(struct uc_struct *uc, struct page_collecti
     /* we remove all the TBs in the range [start, end[ */
     /* XXX: see if in some cases it could be faster to invalidate all
        the code */
-    PAGE_FOR_EACH_TB(p, tb, n) {
+    PAGE_FOR_EACH_TB(p, tb, n)
+    {
         assert_page_locked(p);
         /* NOTE: this is subtle as a TB may span two physical pages */
         if (n == 0) {
@@ -1909,8 +1937,9 @@ tb_invalidate_phys_page_range__locked(struct uc_struct *uc, struct page_collecti
             tb_start = tb->page_addr[1];
             tb_end = tb_start + ((tb->pc + tb->size) & ~TARGET_PAGE_MASK);
         }
-        // Unicorn: We may indeed generate a TB without any instruction which breaks qemu assumption.
-        if ( (!(tb_end <= start || tb_start >= end)) || (tb_start == tb_end) ) {
+        // Unicorn: We may indeed generate a TB without any instruction which
+        // breaks qemu assumption.
+        if ((!(tb_end <= start || tb_start >= end)) || (tb_start == tb_end)) {
 #ifdef TARGET_HAS_PRECISE_SMC
             if (current_tb_not_found) {
                 current_tb_not_found = false;
@@ -1962,7 +1991,8 @@ tb_invalidate_phys_page_range__locked(struct uc_struct *uc, struct page_collecti
  *
  * Called with mmap_lock held for user-mode emulation
  */
-void tb_invalidate_phys_page_range(struct uc_struct *uc, tb_page_addr_t start, tb_page_addr_t end)
+void tb_invalidate_phys_page_range(struct uc_struct *uc, tb_page_addr_t start,
+                                   tb_page_addr_t end)
 {
     struct page_collection *pages;
     PageDesc *p;
@@ -1987,7 +2017,8 @@ void tb_invalidate_phys_page_range(struct uc_struct *uc, tb_page_addr_t start, t
  *
  * Called with mmap_lock held for user-mode emulation.
  */
-void tb_invalidate_phys_range(struct uc_struct *uc, ram_addr_t start, ram_addr_t end)
+void tb_invalidate_phys_range(struct uc_struct *uc, ram_addr_t start,
+                              ram_addr_t end)
 {
     struct page_collection *pages;
     tb_page_addr_t next;
@@ -1996,9 +2027,8 @@ void tb_invalidate_phys_range(struct uc_struct *uc, ram_addr_t start, ram_addr_t
 
     pages = page_collection_lock(uc, start, end);
     for (next = (start & TARGET_PAGE_MASK) + TARGET_PAGE_SIZE;
-         //start < end; Unicorn: Fix possible wrap around
-         (intptr_t)(end - start) > 0;
-         start = next, next += TARGET_PAGE_SIZE) {
+         // start < end; Unicorn: Fix possible wrap around
+         (intptr_t)(end - start) > 0; start = next, next += TARGET_PAGE_SIZE) {
         PageDesc *pd = page_find(uc, start >> TARGET_PAGE_BITS);
         tb_page_addr_t bound = MIN(next, end);
 
@@ -2016,7 +2046,8 @@ void tb_invalidate_phys_range(struct uc_struct *uc, ram_addr_t start, ram_addr_t
  *
  * Call with all @pages in the range [@start, @start + len[ locked.
  */
-void tb_invalidate_phys_page_fast(struct uc_struct *uc, struct page_collection *pages,
+void tb_invalidate_phys_page_fast(struct uc_struct *uc,
+                                  struct page_collection *pages,
                                   tb_page_addr_t start, int len,
                                   uintptr_t retaddr)
 {
@@ -2030,8 +2061,7 @@ void tb_invalidate_phys_page_fast(struct uc_struct *uc, struct page_collection *
     }
 
     assert_page_locked(p);
-    if (!p->code_bitmap &&
-        ++p->code_write_count >= SMC_BITMAP_USE_THRESHOLD) {
+    if (!p->code_bitmap && ++p->code_write_count >= SMC_BITMAP_USE_THRESHOLD) {
         build_page_bitmap(uc, p);
     }
     if (p->code_bitmap) {
@@ -2106,16 +2136,15 @@ void cpu_io_recompile(CPUState *cpu, uintptr_t retaddr)
        branch.  */
     n = 1;
 #if defined(TARGET_MIPS)
-    if ((env->hflags & MIPS_HFLAG_BMASK) != 0
-        && env->active_tc.PC != tb->pc) {
+    if ((env->hflags & MIPS_HFLAG_BMASK) != 0 && env->active_tc.PC != tb->pc) {
         env->active_tc.PC -= (env->hflags & MIPS_HFLAG_B16 ? 2 : 4);
         cpu_neg(cpu)->icount_decr.u16.low++;
         env->hflags &= ~MIPS_HFLAG_BMASK;
         n = 2;
     }
 #elif defined(TARGET_SH4)
-    if ((env->flags & ((DELAY_SLOT | DELAY_SLOT_CONDITIONAL))) != 0
-        && env->pc != tb->pc) {
+    if ((env->flags & ((DELAY_SLOT | DELAY_SLOT_CONDITIONAL))) != 0 &&
+        env->pc != tb->pc) {
         env->pc -= 2;
         cpu_neg(cpu)->icount_decr.u16.low++;
         env->flags &= ~(DELAY_SLOT | DELAY_SLOT_CONDITIONAL);
@@ -2171,8 +2200,8 @@ void tcg_flush_softmmu_tlb(struct uc_struct *uc)
     tlb_flush(uc->cpu);
 }
 
-
-#if defined(__APPLE__) && defined(HAVE_PTHREAD_JIT_PROTECT) && (defined(__arm__) || defined(__aarch64__))
+#if defined(__APPLE__) && defined(HAVE_PTHREAD_JIT_PROTECT) &&                 \
+    (defined(__arm__) || defined(__aarch64__))
 static bool tb_exec_is_locked(struct uc_struct *uc)
 {
     return uc->current_executable;
